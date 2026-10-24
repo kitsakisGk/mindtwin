@@ -21,9 +21,11 @@ Legend: ☐ todo · ☑ done
 - ☑ 📄 Research plan: research questions, hypotheses, contributions, experiments
 - ☑ 📄 LaTeX paper skeleton + automatic PDF build
 - ☑ Architecture document v1 (layers, interfaces, data flow)
-- ☐ C-MAPSS download script + data card
-- ☐ Exploratory data analysis notebook (sensors, degradation trends)
-- ☐ Glossary of CDT terms
+- ☑ C-MAPSS download script + data card
+- ☑ Exploratory data analysis script (sensors, degradation trends, paper figures)
+- ☑ Operating-condition detection and per-condition normalisation
+- ☑ 📄 Dataset subsection of the paper
+- ☑ Glossary of CDT terms
 
 ### Week 2 · 31 Oct – 6 Nov: design
 - ☐ Read and summarise 10 core papers (see literature review)
@@ -32,7 +34,7 @@ Legend: ☐ todo · ☑ done
 - ☐ Config system (pydantic settings), logging
 - ☐ Pre-commit hooks, coverage in CI
 - ☐ 📄 Draft Related Work section from the reading notes
-- ☐ 📄 Fix the C-MAPSS evaluation protocol (written down before any experiment)
+- ☑ 📄 Fix the C-MAPSS evaluation protocol (written down before any experiment)
 
 ## Phase 1: Twin core (weeks 3–5)
 
