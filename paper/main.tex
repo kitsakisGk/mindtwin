@@ -1,0 +1,40 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[numbers]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\graphicspath{{figures/}}
+
+% Draft notes, remove before submission
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\title{mindtwin: An Open Cognitive Digital Twin Framework Integrating\
+Knowledge Graphs, Prognostics and LLM Agents for Predictive Maintenance}
+\author{George Kitsakis}
+\date{Draft, \today}
+
+\begin{document}
+\maketitle
+
+\input{sections/abstract}
+\input{sections/introduction}
+\input{sections/related-work}
+\input{sections/architecture}
+\input{sections/implementation}
+\input{sections/twinqa}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,26 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Digital twins mirror the state of physical assets through continuous data exchange. Cognitive
+digital twins go further, adding capabilities such as perception, memory, reasoning and
+autonomous decision support, typically built on ontologies and knowledge graphs~\citep{zheng2022cdt}.
+
+\todo{Motivation: predictive maintenance, cost of unplanned downtime.}
+
+\todo{Gap: conceptual / proprietary CDTs; LLM twins without evaluation; no open benchmark.}
+
+\paragraph{Research questions.}
+\begin{itemize}
+  \item \textbf{RQ1:} Can a modular CDT be built end-to-end from open components and evaluated on a public benchmark?
+  \item \textbf{RQ2:} Does grounding an LLM agent in the twin improve answer accuracy and faithfulness?
+  \item \textbf{RQ3:} Does knowledge-graph context improve fault localisation and explanation?
+  \item \textbf{RQ4:} Does uncertainty-aware prognosis reduce maintenance cost?
+\end{itemize}
+
+\paragraph{Contributions.}
+\begin{enumerate}
+  \item A CDT reference architecture mapped to concrete, swappable components.
+  \item \emph{mindtwin}, an open-source, reproducible implementation.
+  \item \emph{TwinQA}, a benchmark for evaluating twin-grounded agents.
+  \item An empirical study answering RQ1--RQ4.
+\end{enumerate}
