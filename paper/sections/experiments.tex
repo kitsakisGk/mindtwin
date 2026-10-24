@@ -1,4 +1,68 @@
 \section{Experimental Setup}
 \label{sec:experiments}
 
-	odo{Write this section.}
+\subsection{Dataset}
+\label{sec:dataset}
+
+We use the NASA C-MAPSS turbofan engine degradation dataset~\citep{saxena2008damage}. It consists
+of four subsets (Table~\ref{tab:cmapss}) of simulated run-to-failure trajectories. Each row is one
+operating cycle of one engine, described by three operational settings and 21 sensor
+measurements. Training engines run until failure; test engines stop before failure and are scored
+on their remaining useful life (RUL) at the last observed cycle. We note that the official readme
+swaps the FD004 engine counts; we use the counts found in the data files.
+
+\begin{table}[ht]
+  \centering
+  \caption{C-MAPSS subsets. Life is the number of cycles to failure of training engines.}
+  \label{tab:cmapss}
+  \begin{tabular}{lccccc}
+    \toprule
+    Subset & Conditions & Fault modes & Train / test engines & Life (min / median / max) & Test RUL \\
+    \midrule
+    FD001 & 1 & HPC      & 100 / 100 & 128 / 199 / 362 & 7--145 \\
+    FD002 & 6 & HPC      & 260 / 259 & 128 / 199 / 378 & 6--194 \\
+    FD003 & 1 & HPC, fan & 100 / 100 & 145 / 220 / 525 & 6--145 \\
+    FD004 & 6 & HPC, fan & 249 / 248 & 128 / 234 / 543 & 6--195 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Operating conditions.} In FD002 and FD004, raw sensor values are dominated by six
+operating conditions, which we identify exactly by rounding the three settings. Normalising each
+sensor per condition, with statistics fitted on training data only, raises the strongest rank
+correlation between a sensor and RUL in FD002 from 0.25 to 0.71
+(Figure~\ref{fig:condition-norm}).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\linewidth]{cmapss_condition_normalisation_fd002}
+  \caption{Static pressure at the HPC outlet (s11) in FD002 before and after per-condition
+  normalisation.}
+  \label{fig:condition-norm}
+\end{figure}
+
+\paragraph{Fault signatures.} Comparing FD001 (HPC fault only) with FD003 (HPC and fan faults)
+shows that faults leave different signatures: five sensors that are strongly correlated with RUL
+under the HPC fault (s7, s12, s15, s20, s21) lose this correlation when the fan fault is also
+present (Figure~\ref{fig:fault-signatures}). This motivates representing which component each
+sensor observes and which fault modes affect it, i.e.\ the knowledge graph of
+Section~\ref{sec:architecture}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.6\linewidth]{cmapss_fault_signatures}
+  \caption{Rank correlation of each informative sensor with RUL in FD001 and FD003.}
+  \label{fig:fault-signatures}
+\end{figure}
+
+\subsection{Evaluation protocol}
+\label{sec:protocol}
+
+The protocol was fixed before training any model, following the recommendations
+of~\citet{ramasso2014benchmarking}. Each subset is evaluated separately on its official test set,
+scoring every test engine once at its last cycle. Hyperparameters are tuned on 20\% of the
+training engines (split by engine, not by row). The training target is piecewise-linear RUL capped
+at 125 cycles, with a sensitivity analysis over the cap. We report RMSE and the PHM08
+score~\citep{saxena2008damage}, as mean $\pm$ standard deviation over five seeds.
+
+\todo{Agent (TwinQA) and maintenance-cost setups.}
