@@ -17,10 +17,18 @@ mindtwin combines four layers in one Python package:
 
 The first reference use case is the **NASA C-MAPSS turbofan engine** dataset.
 
+## Research
+
+mindtwin is a research project. Its main output is a paper, written alongside the code in
+[`paper/`](paper/) (the PDF is built automatically on every change).
+
+- [Research plan](docs/research/research-plan.md): research questions, hypotheses, experiments
+- [Literature review](docs/research/literature-review.md)
+- Planned contribution: **TwinQA**, an open benchmark for evaluating twin-grounded AI agents
+
 ## Status
 
-Early development. See the [roadmap](docs/ROADMAP.md) for the 15-week plan and
-[research notes](docs/research/literature-review.md) for background.
+Early development. See the [roadmap](docs/ROADMAP.md) for the 15-week plan.
 
 ## Architecture
 
