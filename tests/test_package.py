@@ -2,7 +2,7 @@ import importlib
 
 import mindtwin
 
-SUBPACKAGES = ["core", "data", "knowledge", "cognition", "agent", "api"]
+SUBPACKAGES = ["core", "data", "knowledge", "cognition", "agent", "api", "evaluation"]
 
 
 def test_version():
