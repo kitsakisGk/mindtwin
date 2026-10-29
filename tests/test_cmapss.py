@@ -69,3 +69,55 @@ def test_extract_nested_zip(tmp_path):
         outer.writestr(cmapss.INNER_ZIP, inner_buf.getvalue())
     cmapss.extract(outer_buf.getvalue(), tmp_path)
     assert sorted(p.name for p in tmp_path.iterdir()) == ["readme.txt", "train_FD001.txt"]
+
+
+def _fake_archive():
+    inner_buf = io.BytesIO()
+    with zipfile.ZipFile(inner_buf, "w") as inner:
+        for s in cmapss.SUBSETS:
+            inner.writestr(f"train_{s}.txt", "1 1")
+    outer_buf = io.BytesIO()
+    with zipfile.ZipFile(outer_buf, "w") as outer:
+        outer.writestr(cmapss.INNER_ZIP, inner_buf.getvalue())
+    return outer_buf.getvalue()
+
+
+def _patch_urlopen(monkeypatch, payload):
+    calls = []
+
+    def fake_urlopen(url, timeout):
+        calls.append(url)
+        return io.BytesIO(payload)
+
+    monkeypatch.setattr(cmapss.urllib.request, "urlopen", fake_urlopen)
+    return calls
+
+
+def test_download_verifies_checksum_and_extracts(tmp_path, monkeypatch):
+    archive = _fake_archive()
+    monkeypatch.setattr(cmapss, "DATA_SHA256", cmapss._sha256(archive))
+    calls = _patch_urlopen(monkeypatch, archive)
+    assert cmapss.download(tmp_path) == tmp_path
+    assert (tmp_path / "train_FD004.txt").exists()
+    cmapss.download(tmp_path)  # already present: no second request
+    assert len(calls) == 1
+
+
+def test_download_rejects_tampered_archive(tmp_path, monkeypatch):
+    _patch_urlopen(monkeypatch, b"not the real file")
+    with pytest.raises(ValueError, match="Checksum"):
+        cmapss.download(tmp_path)
+    assert not list(tmp_path.iterdir())
+
+
+def test_cli_download(tmp_path, monkeypatch, capsys):
+    archive = _fake_archive()
+    monkeypatch.setattr(cmapss, "DATA_SHA256", cmapss._sha256(archive))
+    _patch_urlopen(monkeypatch, archive)
+    cmapss.main(["download", "--data-dir", str(tmp_path)])
+    assert "ready" in capsys.readouterr().out
+
+
+def test_default_data_dir_from_env(monkeypatch, tmp_path):
+    monkeypatch.setenv("MINDTWIN_DATA_DIR", str(tmp_path))
+    assert cmapss.default_data_dir() == tmp_path
