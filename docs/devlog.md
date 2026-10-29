@@ -29,4 +29,5 @@
   tool-using agent, evaluated quantitatively on a public benchmark (TwinQA).
 - Settings (TOML + env) and logging; pre-commit config; coverage gate (85%, currently 99%);
   format check in CI; LF line endings.
-- Local pre-commit hook disabled: git 2.30 is too old for pre-commit 4.x.
+- Updated git 2.30 → 2.56 (pre-commit 4.x needs git >= 2.31) and enabled the pre-commit hooks.
+- EDA outputs are now byte-reproducible (LF line endings, no PDF timestamps).

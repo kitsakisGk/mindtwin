@@ -32,7 +32,7 @@ Legend: ☐ todo · ☑ done
 - ☑ Turbofan ontology draft (components, sensors, failure modes), SOSA-aligned, with tests
 - ☐ Decide storage: time-series store + graph store
 - ☑ Config system (pydantic settings), logging
-- ☑ Pre-commit hooks, coverage in CI (local hook needs a newer git)
+- ☑ Pre-commit hooks, coverage in CI
 - ☑ 📄 Draft Related Work section from the reading notes
 - ☑ 📄 Fix the C-MAPSS evaluation protocol (written down before any experiment)
 
