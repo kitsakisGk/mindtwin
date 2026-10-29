@@ -22,6 +22,7 @@ dependencies = [
     "numpy>=1.26",
     "pandas>=2.1",
     "pydantic>=2.6",
+    "rdflib>=7.0",
 ]
 
 [project.optional-dependencies]

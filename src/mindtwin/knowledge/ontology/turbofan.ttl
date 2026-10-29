@@ -1,0 +1,106 @@
+@prefix mt:   <https://kitsakisgk.github.io/mindtwin/ontology#> .
+@prefix tf:   <https://kitsakisgk.github.io/mindtwin/turbofan#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# Turbofan domain ontology (v0.1, draft) for the NASA C-MAPSS engine model.
+# Structural knowledge only, taken from the C-MAPSS documentation (Saxena et al. 2008):
+# modules, gas path, shafts, sensor locations and the modules each fault mode degrades.
+# Fault symptoms (mt:hasSymptom) are NOT asserted here; the twin learns them from data.
+
+<https://kitsakisgk.github.io/mindtwin/turbofan> a owl:Ontology ;
+    dcterms:title "mindtwin turbofan ontology"@en ;
+    dcterms:creator "George Kitsakis" ;
+    owl:versionInfo "0.1" ;
+    owl:imports <https://kitsakisgk.github.io/mindtwin/ontology> .
+
+tf:TurbofanEngine a owl:Class ; rdfs:subClassOf mt:Asset ; rdfs:label "Turbofan engine"@en .
+
+# ---------------------------------------------------------------- modules
+# Components of the reference engine. Each twin instance copies this template.
+
+tf:Fan a mt:Component ; rdfs:label "Fan"@en .
+tf:LPC a mt:Component ; rdfs:label "Low-pressure compressor"@en .
+tf:HPC a mt:Component ; rdfs:label "High-pressure compressor"@en .
+tf:Combustor a mt:Component ; rdfs:label "Combustor (burner)"@en .
+tf:HPT a mt:Component ; rdfs:label "High-pressure turbine"@en .
+tf:LPT a mt:Component ; rdfs:label "Low-pressure turbine"@en .
+tf:Nozzle a mt:Component ; rdfs:label "Core nozzle"@en .
+tf:BypassDuct a mt:Component ; rdfs:label "Bypass duct"@en .
+tf:LPShaft a mt:Component ; rdfs:label "Low-pressure (fan) shaft"@en .
+tf:HPShaft a mt:Component ; rdfs:label "High-pressure (core) shaft"@en .
+
+tf:ReferenceEngine a tf:TurbofanEngine ;
+    rdfs:label "C-MAPSS reference turbofan engine"@en ;
+    mt:hasComponent tf:Fan, tf:LPC, tf:HPC, tf:Combustor, tf:HPT, tf:LPT, tf:Nozzle,
+                    tf:BypassDuct, tf:LPShaft, tf:HPShaft .
+
+# Gas path: core flow and bypass flow.
+tf:Fan mt:upstreamOf tf:LPC, tf:BypassDuct .
+tf:LPC mt:upstreamOf tf:HPC .
+tf:HPC mt:upstreamOf tf:Combustor .
+tf:Combustor mt:upstreamOf tf:HPT .
+tf:HPT mt:upstreamOf tf:LPT .
+tf:LPT mt:upstreamOf tf:Nozzle .
+
+# Shafts: LP shaft links fan, LPC and LPT; HP shaft links HPC and HPT.
+tf:LPShaft mt:mechanicallyCoupledTo tf:Fan, tf:LPC, tf:LPT .
+tf:HPShaft mt:mechanicallyCoupledTo tf:HPC, tf:HPT .
+
+# ---------------------------------------------------------------- sensors
+
+tf:s1 a mt:Sensor ; mt:columnName "s1" ; mt:symbol "T2" ; rdfs:label "Total temperature at fan inlet"@en ;
+    mt:unit "°R" ; sosa:observes [ a mt:Temperature ] ; mt:monitors tf:Fan .
+tf:s2 a mt:Sensor ; mt:columnName "s2" ; mt:symbol "T24" ; rdfs:label "Total temperature at LPC outlet"@en ;
+    mt:unit "°R" ; sosa:observes [ a mt:Temperature ] ; mt:monitors tf:LPC .
+tf:s3 a mt:Sensor ; mt:columnName "s3" ; mt:symbol "T30" ; rdfs:label "Total temperature at HPC outlet"@en ;
+    mt:unit "°R" ; sosa:observes [ a mt:Temperature ] ; mt:monitors tf:HPC .
+tf:s4 a mt:Sensor ; mt:columnName "s4" ; mt:symbol "T50" ; rdfs:label "Total temperature at LPT outlet"@en ;
+    mt:unit "°R" ; sosa:observes [ a mt:Temperature ] ; mt:monitors tf:LPT .
+tf:s5 a mt:Sensor ; mt:columnName "s5" ; mt:symbol "P2" ; rdfs:label "Pressure at fan inlet"@en ;
+    mt:unit "psia" ; sosa:observes [ a mt:Pressure ] ; mt:monitors tf:Fan .
+tf:s6 a mt:Sensor ; mt:columnName "s6" ; mt:symbol "P15" ; rdfs:label "Total pressure in bypass duct"@en ;
+    mt:unit "psia" ; sosa:observes [ a mt:Pressure ] ; mt:monitors tf:BypassDuct .
+tf:s7 a mt:Sensor ; mt:columnName "s7" ; mt:symbol "P30" ; rdfs:label "Total pressure at HPC outlet"@en ;
+    mt:unit "psia" ; sosa:observes [ a mt:Pressure ] ; mt:monitors tf:HPC .
+tf:s8 a mt:Sensor ; mt:columnName "s8" ; mt:symbol "Nf" ; rdfs:label "Physical fan speed"@en ;
+    mt:unit "rpm" ; sosa:observes [ a mt:RotationalSpeed ] ; mt:monitors tf:LPShaft .
+tf:s9 a mt:Sensor ; mt:columnName "s9" ; mt:symbol "Nc" ; rdfs:label "Physical core speed"@en ;
+    mt:unit "rpm" ; sosa:observes [ a mt:RotationalSpeed ] ; mt:monitors tf:HPShaft .
+tf:s10 a mt:Sensor ; mt:columnName "s10" ; mt:symbol "epr" ; rdfs:label "Engine pressure ratio (P50/P2)"@en ;
+    mt:unit "-" ; sosa:observes [ a mt:Ratio ] ; mt:monitors tf:ReferenceEngine .
+tf:s11 a mt:Sensor ; mt:columnName "s11" ; mt:symbol "Ps30" ; rdfs:label "Static pressure at HPC outlet"@en ;
+    mt:unit "psia" ; sosa:observes [ a mt:Pressure ] ; mt:monitors tf:HPC .
+tf:s12 a mt:Sensor ; mt:columnName "s12" ; mt:symbol "phi" ; rdfs:label "Ratio of fuel flow to Ps30"@en ;
+    mt:unit "pps/psi" ; sosa:observes [ a mt:Ratio ] ; mt:monitors tf:Combustor .
+tf:s13 a mt:Sensor ; mt:columnName "s13" ; mt:symbol "NRf" ; rdfs:label "Corrected fan speed"@en ;
+    mt:unit "rpm" ; sosa:observes [ a mt:RotationalSpeed ] ; mt:monitors tf:LPShaft .
+tf:s14 a mt:Sensor ; mt:columnName "s14" ; mt:symbol "NRc" ; rdfs:label "Corrected core speed"@en ;
+    mt:unit "rpm" ; sosa:observes [ a mt:RotationalSpeed ] ; mt:monitors tf:HPShaft .
+tf:s15 a mt:Sensor ; mt:columnName "s15" ; mt:symbol "BPR" ; rdfs:label "Bypass ratio"@en ;
+    mt:unit "-" ; sosa:observes [ a mt:Ratio ] ; mt:monitors tf:BypassDuct .
+tf:s16 a mt:Sensor ; mt:columnName "s16" ; mt:symbol "farB" ; rdfs:label "Burner fuel-air ratio"@en ;
+    mt:unit "-" ; sosa:observes [ a mt:Ratio ] ; mt:monitors tf:Combustor .
+tf:s17 a mt:Sensor ; mt:columnName "s17" ; mt:symbol "htBleed" ; rdfs:label "Bleed enthalpy"@en ;
+    mt:unit "-" ; sosa:observes [ a mt:Enthalpy ] ; mt:monitors tf:HPC .
+tf:s18 a mt:ControlSignal ; mt:columnName "s18" ; mt:symbol "Nf_dmd" ; rdfs:label "Demanded fan speed"@en ;
+    mt:unit "rpm" ; sosa:observes [ a mt:RotationalSpeed ] ; mt:monitors tf:LPShaft .
+tf:s19 a mt:ControlSignal ; mt:columnName "s19" ; mt:symbol "PCNfR_dmd" ; rdfs:label "Demanded corrected fan speed"@en ;
+    mt:unit "rpm" ; sosa:observes [ a mt:RotationalSpeed ] ; mt:monitors tf:LPShaft .
+tf:s20 a mt:Sensor ; mt:columnName "s20" ; mt:symbol "W31" ; rdfs:label "HPT coolant bleed"@en ;
+    mt:unit "lbm/s" ; sosa:observes [ a mt:Flow ] ; mt:monitors tf:HPT .
+tf:s21 a mt:Sensor ; mt:columnName "s21" ; mt:symbol "W32" ; rdfs:label "LPT coolant bleed"@en ;
+    mt:unit "lbm/s" ; sosa:observes [ a mt:Flow ] ; mt:monitors tf:LPT .
+
+# ---------------------------------------------------------------- fault modes
+# C-MAPSS simulates degradation as loss of efficiency and flow capacity of a module.
+
+tf:HPCDegradation a mt:FaultMode ;
+    rdfs:label "HPC degradation"@en ;
+    mt:affects tf:HPC .
+
+tf:FanDegradation a mt:FaultMode ;
+    rdfs:label "Fan degradation"@en ;
+    mt:affects tf:Fan .

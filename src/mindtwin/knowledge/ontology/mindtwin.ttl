@@ -1,0 +1,128 @@
+@prefix mt:   <https://kitsakisgk.github.io/mindtwin/ontology#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# mindtwin core ontology (v0.1, draft).
+# Domain-independent concepts of a cognitive digital twin. Sensors and observations reuse the
+# W3C SOSA vocabulary. Domain ontologies (e.g. turbofan.ttl) import and specialise this one.
+
+<https://kitsakisgk.github.io/mindtwin/ontology> a owl:Ontology ;
+    dcterms:title "mindtwin core ontology"@en ;
+    dcterms:creator "George Kitsakis" ;
+    owl:versionInfo "0.1" ;
+    owl:imports <http://www.w3.org/ns/sosa/> .
+
+# ---------------------------------------------------------------- structure
+
+mt:Asset a owl:Class ;
+    rdfs:subClassOf sosa:FeatureOfInterest ;
+    rdfs:label "Asset"@en ;
+    rdfs:comment "A physical system represented by a digital twin."@en .
+
+mt:Component a owl:Class ;
+    rdfs:subClassOf sosa:FeatureOfInterest ;
+    rdfs:label "Component"@en ;
+    rdfs:comment "A part of an asset that can be observed and can degrade."@en .
+
+mt:hasComponent a owl:ObjectProperty ;
+    rdfs:domain mt:Asset ; rdfs:range mt:Component ;
+    owl:inverseOf mt:partOf ;
+    rdfs:label "has component"@en .
+
+mt:partOf a owl:ObjectProperty ;
+    rdfs:label "part of"@en .
+
+mt:upstreamOf a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain mt:Component ; rdfs:range mt:Component ;
+    rdfs:label "upstream of"@en ;
+    rdfs:comment "Flow order between components (e.g. gas path). Used to reason about how a fault propagates."@en .
+
+mt:mechanicallyCoupledTo a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain mt:Component ; rdfs:range mt:Component ;
+    rdfs:label "mechanically coupled to"@en ;
+    rdfs:comment "Components sharing a shaft or other mechanical link."@en .
+
+# ---------------------------------------------------------------- sensing
+
+mt:Sensor a owl:Class ;
+    rdfs:subClassOf sosa:Sensor ;
+    rdfs:label "Sensor"@en .
+
+mt:ControlSignal a owl:Class ;
+    rdfs:subClassOf mt:Sensor ;
+    rdfs:label "Control signal"@en ;
+    rdfs:comment "A recorded set-point or demand rather than a physical measurement."@en .
+
+mt:monitors a owl:ObjectProperty ;
+    rdfs:domain mt:Sensor ; rdfs:range sosa:FeatureOfInterest ;
+    rdfs:label "monitors"@en ;
+    rdfs:comment "The component (or asset) whose state the sensor measures."@en .
+
+mt:columnName a owl:DatatypeProperty ;
+    rdfs:domain mt:Sensor ; rdfs:range xsd:string ;
+    rdfs:label "column name"@en ;
+    rdfs:comment "Name of the sensor's column in the dataset."@en .
+
+mt:symbol a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "symbol"@en .
+
+mt:unit a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "unit"@en .
+
+mt:Temperature a owl:Class ; rdfs:subClassOf sosa:ObservableProperty ; rdfs:label "Temperature"@en .
+mt:Pressure a owl:Class ; rdfs:subClassOf sosa:ObservableProperty ; rdfs:label "Pressure"@en .
+mt:RotationalSpeed a owl:Class ; rdfs:subClassOf sosa:ObservableProperty ; rdfs:label "Rotational speed"@en .
+mt:Ratio a owl:Class ; rdfs:subClassOf sosa:ObservableProperty ; rdfs:label "Ratio"@en .
+mt:Flow a owl:Class ; rdfs:subClassOf sosa:ObservableProperty ; rdfs:label "Flow"@en .
+mt:Enthalpy a owl:Class ; rdfs:subClassOf sosa:ObservableProperty ; rdfs:label "Enthalpy"@en .
+
+# ---------------------------------------------------------------- faults
+
+mt:FaultMode a owl:Class ;
+    rdfs:label "Fault mode"@en ;
+    rdfs:comment "A way in which a component degrades or fails."@en .
+
+mt:affects a owl:ObjectProperty ;
+    rdfs:domain mt:FaultMode ; rdfs:range mt:Component ;
+    rdfs:label "affects"@en .
+
+mt:hasSymptom a owl:ObjectProperty ;
+    rdfs:domain mt:FaultMode ; rdfs:range mt:Sensor ;
+    rdfs:label "has symptom"@en ;
+    rdfs:comment "The fault leaves a signature in this sensor. Learned from data by the twin (semantic memory), not asserted by hand."@en .
+
+# ---------------------------------------------------------------- operation and lifecycle
+
+mt:OperatingCondition a owl:Class ;
+    rdfs:label "Operating condition"@en .
+
+mt:Event a owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "Something the twin noticed or did at a point in the asset's life (episodic memory)."@en .
+
+mt:Anomaly a owl:Class ; rdfs:subClassOf mt:Event ; rdfs:label "Anomaly"@en .
+mt:MaintenanceAction a owl:Class ; rdfs:subClassOf mt:Event ; rdfs:label "Maintenance action"@en .
+mt:Prognosis a owl:Class ; rdfs:subClassOf mt:Event ; rdfs:label "Prognosis"@en ;
+    rdfs:comment "A remaining-useful-life estimate with uncertainty."@en .
+
+mt:observedOn a owl:ObjectProperty ;
+    rdfs:domain mt:Event ; rdfs:range mt:Sensor ;
+    rdfs:label "observed on"@en .
+
+mt:concerns a owl:ObjectProperty ;
+    rdfs:domain mt:Event ; rdfs:range sosa:FeatureOfInterest ;
+    rdfs:label "concerns"@en .
+
+mt:suspectedCause a owl:ObjectProperty ;
+    rdfs:domain mt:Event ; rdfs:range mt:FaultMode ;
+    rdfs:label "suspected cause"@en .
+
+mt:atCycle a owl:DatatypeProperty ;
+    rdfs:domain mt:Event ; rdfs:range xsd:integer ;
+    rdfs:label "at cycle"@en .
