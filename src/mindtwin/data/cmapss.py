@@ -10,8 +10,8 @@ Usage::
     data = load_cmapss("FD001")
     data.train.head()
 
-The data directory defaults to ``./data/raw/cmapss`` and can be changed with the
-``MINDTWIN_DATA_DIR`` environment variable.
+The data directory defaults to ``./data/raw/cmapss`` and can be changed in ``mindtwin.toml``
+or with the ``MINDTWIN_DATA_DIR`` environment variable.
 """
 
 from __future__ import annotations
@@ -19,7 +19,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import io
-import os
 import urllib.request
 import zipfile
 from dataclasses import dataclass
@@ -27,6 +26,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+from mindtwin.log import get_logger, setup_logging
+
+log = get_logger(__name__)
 
 DATA_URL = (
     "https://phm-datasets.s3.amazonaws.com/NASA/"
@@ -108,7 +111,9 @@ class CMAPSSData:
 
 
 def default_data_dir() -> Path:
-    return Path(os.environ.get("MINDTWIN_DATA_DIR", "data/raw/cmapss"))
+    from mindtwin.config import load_settings
+
+    return load_settings().data_dir
 
 
 def _sha256(data: bytes) -> str:
@@ -131,12 +136,14 @@ def download(data_dir: Path | None = None, force: bool = False) -> Path:
     data_dir = Path(data_dir) if data_dir else default_data_dir()
     if not force and all((data_dir / f"train_{s}.txt").exists() for s in SUBSETS):
         return data_dir
+    log.info("Downloading C-MAPSS from %s", DATA_URL)
     with urllib.request.urlopen(DATA_URL, timeout=120) as response:
         archive = response.read()
     digest = _sha256(archive)
     if digest != DATA_SHA256:
         raise ValueError(f"Checksum mismatch for C-MAPSS archive: {digest}")
     extract(archive, data_dir)
+    log.info("Extracted C-MAPSS to %s", data_dir)
     return data_dir
 
 
@@ -183,6 +190,7 @@ def main(argv: list[str] | None = None) -> None:
     dl.add_argument("--data-dir", type=Path, default=None)
     dl.add_argument("--force", action="store_true")
     args = parser.parse_args(argv)
+    setup_logging()
     if args.command == "download":
         path = download(args.data_dir, force=args.force)
         print(f"C-MAPSS ready in {path}")

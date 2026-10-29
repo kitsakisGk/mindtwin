@@ -23,6 +23,7 @@ dependencies = [
     "pandas>=2.1",
     "pydantic>=2.6",
     "rdflib>=7.0",
+    "tomli>=2.0; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]

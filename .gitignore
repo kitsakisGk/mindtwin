@@ -52,3 +52,6 @@ paper/*.fls
 paper/*.fdb_latexmk
 paper/*.synctex.gz
 paper/main.pdf
+
+# Local config
+mindtwin.toml

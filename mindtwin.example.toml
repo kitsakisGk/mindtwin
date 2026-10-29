@@ -1,0 +1,6 @@
+# Copy to mindtwin.toml to override defaults. Environment variables MINDTWIN_<FIELD> win over this file.
+data_dir = "data/raw/cmapss"
+results_dir = "experiments/results"
+seed = 42
+rul_cap = 125
+log_level = "INFO"
