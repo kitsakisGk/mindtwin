@@ -32,7 +32,7 @@ mindtwin follows the closed-loop view.
 
 ## 3. Gap
 
-Most CDT work is conceptual (architectures, visions) or closed industrial platforms. There is
+Most CDT work is conceptual (architectures, visions) or closed industrial platforms. Recent work (2025–26) adds LLM agents (Lou et al. 2025; Gill et al. 2025; AgenticTwin 2026) and twin topology for RUL (Ma et al. 2026), see [reading notes](reading-notes.md). There is
 little **open-source, end-to-end, reproducible** implementation that connects a live twin, a
 knowledge graph, prognostic models and an LLM agent, evaluated on a public benchmark.
 **mindtwin aims to fill that gap.**

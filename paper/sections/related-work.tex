@@ -1,14 +1,57 @@
 \section{Background and Related Work}
 \label{sec:related-work}
 
-\subsection{Digital twins and cognitive digital twins}
-\todo{Definitions; Zheng et al.~\citep{zheng2022cdt}; RAMI 4.0 based architectures.}
+\subsection{From digital twins to cognitive digital twins}
+
+A digital twin keeps a virtual representation of a physical asset synchronised with it through
+data. Abburu et al.~\citep{abburu2020cognitwin} distinguish digital, hybrid and cognitive twins
+and propose an architecture for cognitive twins in the process industry. Zheng et
+al.~\citep{zheng2022cdt} review the emerging cognitive digital twin (CDT) concept, consolidate its
+definitions and key features, and propose a reference architecture based on RAMI~4.0. Both works
+are primarily conceptual: they define what a CDT should do, but do not provide an open
+implementation evaluated on a public benchmark. A recent survey~\citep{zhou2026dtai} describes how
+AI moves digital twins from passive simulation towards autonomous management with large language
+models (LLMs) and agents, and names explainability and trustworthiness as open challenges.
 
 \subsection{Ontologies and knowledge graphs in digital twins}
-\todo{Karabulut et al.~\citep{karabulut2024ontologies}.}
 
-\subsection{Data-driven prognostics}
-\todo{C-MAPSS~\citep{saxena2008damage}; benchmarking issues~\citep{ramasso2014benchmarking}.}
+Semantic technologies are the usual basis of a twin's knowledge. Karabulut et
+al.~\citep{karabulut2024ontologies} review 82 studies that use ontologies in digital twins for
+knowledge representation, interoperability and reasoning, and identify open research directions.
+Shi et al.~\citep{shi2025rag} enhance retrieval-augmented generation over interoperable industrial
+knowledge as a step towards CDTs. mindtwin builds its knowledge layer on the W3C SOSA
+vocabulary~\citep{w3c2017sosa}, and differs from prior work in two ways: it separates hand-written
+structural knowledge from fault signatures learned from data, and it measures whether the
+knowledge graph improves fault localisation (RQ3).
 
-\subsection{LLM agents and digital twins}
-\todo{LLM-based CDTs, agentic predictive maintenance, GraphRAG.}
+\subsection{LLM agents in digital twins}
+
+Lou et al.~\citep{lou2025cdtllm} place an LLM agent at the core of a CDT, using retrieval over tool
+libraries and industrial knowledge graphs to turn human commands into function calls, and
+demonstrate it on a lab-scale manufacturing unit. Gill et al.~\citep{gill2025faulthandling} combine
+LLM agents with a digital twin that serves as a knowledge source and as a simulator to verify
+corrective actions in a process plant. AgenticTwin~\citep{hasan2026agentictwin} grounds LLM
+explanations in a twin-driven anomaly classifier and evaluates them with generated operator
+queries over synthetic anomalies in weather sensor data. These works show the promise of
+twin-grounded agents, but evaluation is either qualitative or limited to anomaly explanation.
+None evaluates agents on prognostic and causal questions against computed ground truth on a
+public benchmark; TwinQA addresses this gap.
+
+\subsection{Data-driven prognostics on C-MAPSS}
+
+C-MAPSS~\citep{saxena2008damage} is the most widely used benchmark for remaining useful life (RUL)
+prediction, but inconsistent evaluation practices make published results hard to
+compare~\citep{ramasso2014benchmarking}; we therefore fix our protocol before experimentation
+(Section~\ref{sec:protocol}). Closest to our use of structure, Ma et
+al.~\citep{ma2026tsfm} constrain the cross-attention of time-series foundation models with the
+asset topology stored in the twin and report small but consistent gains. mindtwin uses structure
+differently: not inside the predictor, but for reasoning about causes and for explaining
+predictions to users.
+
+\subsection{Summary of the gap}
+
+Existing work covers individual pieces: CDT architectures, knowledge graphs, LLM agents and
+structure-aware prognostics. To our knowledge, no open system combines a live twin, an
+ontology-based knowledge graph with learned fault signatures, uncertainty-aware prognostics and a
+tool-using LLM agent, and evaluates the agent quantitatively against baselines on a public
+prognostics benchmark. This combination is the subject of this paper.
