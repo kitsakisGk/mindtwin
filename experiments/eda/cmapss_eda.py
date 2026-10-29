@@ -63,7 +63,7 @@ def sensor_label(col: str) -> str:
 def save(fig, name: str) -> None:
     PAPER_FIG.mkdir(parents=True, exist_ok=True)
     DOCS_FIG.mkdir(parents=True, exist_ok=True)
-    fig.savefig(PAPER_FIG / f"{name}.pdf")
+    fig.savefig(PAPER_FIG / f"{name}.pdf", metadata={"CreationDate": None})  # reproducible
     fig.savefig(DOCS_FIG / f"{name}.png", dpi=160)
     plt.close(fig)
 
@@ -186,8 +186,9 @@ def main() -> None:
     signatures = fig_fault_signatures(data["FD001"], data["FD003"])
 
     RESULTS.mkdir(parents=True, exist_ok=True)
-    (RESULTS / "summary.json").write_text(json.dumps(summary, indent=2))
-    signatures.to_csv(RESULTS / "fault_signatures.csv")
+    # Write LF line endings on every OS so results are byte-identical across machines.
+    (RESULTS / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", newline="\n")
+    signatures.to_csv(RESULTS / "fault_signatures.csv", lineterminator="\n")
     print(json.dumps(summary, indent=2))
     print(signatures)
 
