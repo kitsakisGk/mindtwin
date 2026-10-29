@@ -62,8 +62,9 @@ git clone https://github.com/kitsakisGk/mindtwin.git
 cd mindtwin
 python -m venv .venv
 .venv/Scripts/activate      # Windows  (Linux/macOS: source .venv/bin/activate)
-pip install -e ".[dev]"
+pip install -e ".[dev,experiments]"
 pytest
+pre-commit install          # optional, needs git >= 2.31
 ```
 
 ## Project layout

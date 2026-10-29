@@ -28,12 +28,12 @@ Legend: ☐ todo · ☑ done
 - ☑ Glossary of CDT terms
 
 ### Week 2 · 31 Oct – 6 Nov: design
-- ☐ Read and summarise 10 core papers (see literature review)
-- ☐ Turbofan ontology draft (components, sensors, failure modes)
+- ☑ Read and summarise core papers ([reading notes](research/reading-notes.md), 11 papers)
+- ☑ Turbofan ontology draft (components, sensors, failure modes), SOSA-aligned, with tests
 - ☐ Decide storage: time-series store + graph store
-- ☐ Config system (pydantic settings), logging
-- ☐ Pre-commit hooks, coverage in CI
-- ☐ 📄 Draft Related Work section from the reading notes
+- ☑ Config system (pydantic settings), logging
+- ☑ Pre-commit hooks, coverage in CI (local hook needs a newer git)
+- ☑ 📄 Draft Related Work section from the reading notes
 - ☑ 📄 Fix the C-MAPSS evaluation protocol (written down before any experiment)
 
 ## Phase 1: Twin core (weeks 3–5)
