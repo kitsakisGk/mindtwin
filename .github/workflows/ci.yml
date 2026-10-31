@@ -18,6 +18,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: pip install -e ".[dev]"
+      - name: Cache C-MAPSS
+        uses: actions/cache@v4
+        with:
+          path: data/raw/cmapss
+          key: cmapss-c9c5dec12a94
+      - name: Download C-MAPSS (checksum verified)
+        run: python -m mindtwin.data.cmapss download
       - name: Lint
         run: |
           ruff check .

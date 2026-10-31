@@ -47,6 +47,7 @@ packages = ["src/mindtwin"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = ["integration: needs the downloaded C-MAPSS data"]
 
 [tool.ruff]
 line-length = 100

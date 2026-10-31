@@ -6,6 +6,7 @@ C-MAPSS engine.
 
 from __future__ import annotations
 
+from functools import lru_cache
 from importlib import resources
 
 from rdflib import Graph, Namespace
@@ -28,3 +29,10 @@ def load_ontology(*names: str) -> Graph:
         source = resources.files(__name__).joinpath(ONTOLOGY_FILES[name])
         graph.parse(data=source.read_text(encoding="utf-8"), format="turtle")
     return graph
+
+
+@lru_cache(maxsize=1)
+def default_ontology() -> Graph:
+    """Shared, parsed core + turbofan ontology. Treat as read-only; use ``load_ontology()``
+    for a private copy you can modify."""
+    return load_ontology()

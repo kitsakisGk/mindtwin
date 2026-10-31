@@ -5,7 +5,7 @@ from __future__ import annotations
 from rdflib import RDF, RDFS, Graph, URIRef
 
 from mindtwin.core.models import ASSET_LEVEL, Asset, Component, Sensor
-from mindtwin.knowledge.ontology import MT, TF, load_ontology
+from mindtwin.knowledge.ontology import MT, TF, default_ontology
 
 
 def local_name(uri: URIRef) -> str:
@@ -20,7 +20,7 @@ def asset_from_ontology(
     graph: Graph | None = None,
 ) -> Asset:
     """Create an asset (e.g. one C-MAPSS engine) from a template individual in the ontology."""
-    graph = graph if graph is not None else load_ontology()
+    graph = graph if graph is not None else default_ontology()
 
     component_uris = sorted(graph.objects(template, MT.hasComponent), key=str)
     if not component_uris:
