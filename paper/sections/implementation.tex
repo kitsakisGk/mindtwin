@@ -1,4 +1,52 @@
 \section{Implementation}
 \label{sec:implementation}
 
-	odo{Write this section.}
+mindtwin is implemented as an open-source Python package (MIT licence). All components run in a
+single process without external services: twin state and history are kept in memory, the
+knowledge graph uses an in-memory RDF store with SPARQL support, and episodic memory will use an
+embedded SQLite database. This keeps every experiment reproducible from a plain package
+installation, at the cost of horizontal scalability (Section~\ref{sec:discussion}).
+
+\subsection{Knowledge layer}
+\label{sec:impl-knowledge}
+
+The knowledge layer consists of two OWL ontologies serialised in Turtle. The \emph{core} ontology
+defines domain-independent concepts of a cognitive twin: assets and components (as
+\texttt{sosa:FeatureOfInterest}), sensors and control signals (as \texttt{sosa:Sensor}), observable
+properties, fault modes and events (anomalies, prognoses, maintenance actions). Structural
+relations capture flow order between components (\texttt{upstreamOf}, transitive), mechanical
+coupling (\texttt{mechanicallyCoupledTo}, symmetric) and sensor location (\texttt{monitors}).
+Reusing SOSA~\citep{w3c2017sosa} keeps the graph readable by standard tools.
+
+The \emph{turbofan} ontology specialises the core for the C-MAPSS engine: ten components (fan,
+low- and high-pressure compressors and turbines, combustor, nozzle, bypass duct and two shafts),
+the core and bypass gas paths, the two shafts, the location of all 21 recorded signals, and the
+component degraded by each of the two fault modes. Only knowledge stated in the engine
+documentation~\citep{saxena2008damage} is asserted by hand. Which sensors respond to which fault
+(\texttt{hasSymptom}) is deliberately left empty: the twin learns these links from data and writes
+them back as semantic memory, which keeps prior knowledge and learned knowledge separable for the
+evaluation of RQ3.
+
+\subsection{Twin core}
+\label{sec:impl-core}
+
+An \texttt{Asset} is built from a template individual in the ontology, so the twin and the
+knowledge graph share one source of truth. It exposes structural queries used later by the
+reasoning layer, such as the components downstream of a given component or the sensors that
+monitor it. Notably, the five sensors whose correlation with RUL disappears when the fan fault is
+present (Figure~\ref{fig:fault-signatures}) all monitor components downstream of the fan, which
+illustrates how structure constrains fault signatures.
+
+A \texttt{DigitalTwin} wraps one asset. It ingests one validated \texttt{Snapshot} per operating
+cycle (operating settings and sensor readings), rejecting snapshots for another asset, out-of-order
+cycles, unknown sensors and infinite values, and keeps the current state and the history (optionally
+bounded). Cognitive components subscribe to the twin and are notified after every update; a
+failing subscriber is logged and isolated so it cannot corrupt the twin's state. Ground-truth labels
+such as RUL are never passed to the twin, so components cannot accidentally access them.
+
+For experiments, each C-MAPSS engine is replayed cycle by cycle into its own twin. On a laptop
+(Python~3.12, single core), the 249 training engines of FD004 (61{,}249 cycles) are replayed in
+\SI{2.9}{\second}, about 21{,}000 snapshots per second, which is far faster than real time and
+sufficient for all experiments. \todo{Report final hardware and re-measure at submission time.}
+
+\todo{Cognition, memory and agent subsections.}
