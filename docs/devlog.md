@@ -31,3 +31,15 @@
   format check in CI; LF line endings.
 - Updated git 2.30 → 2.56 (pre-commit 4.x needs git >= 2.31) and enabled the pre-commit hooks.
 - EDA outputs are now byte-reproducible (LF line endings, no PDF timestamps).
+
+## 2026-10-31 · Day 4
+- ADR 0001: in-memory state/history, rdflib graph as Turtle, SQLite for episodic memory later;
+  no external services so every result is reproducible from `pip install`.
+- `Asset` / `Component` / `Sensor` models built from the ontology (single source of truth),
+  with structure queries (downstream components, coupling, sensors per component).
+- `DigitalTwin`: validated updates (asset id, increasing cycles, known sensors, no inf),
+  current state, history as DataFrame, bounded history, subscribers isolated from failures.
+- Replay of real C-MAPSS engines into twins. Caching the parsed ontology made replay 3x faster:
+  all 249 FD004 training engines (61,249 cycles) in 2.9 s, ~21k snapshots/s.
+- CI now downloads C-MAPSS (checksum verified, cached) and runs integration tests on real data.
+- Paper: Implementation section for the knowledge layer and twin core.

@@ -58,13 +58,17 @@ This document describes the mindtwin architecture. It is the basis for Section 3
    the nodes, events and model outputs it used.
 9. **Learn.** Decisions and outcomes are written back to memory and the graph.
 
-## 4. Core interfaces (draft)
+## 4. Core interfaces
+
+Implemented (week 3): `Asset`, `Snapshot`, `DigitalTwin` in `mindtwin.core`. The rest is a draft.
 
 ```python
-class DigitalTwin:
-    def update(self, snapshot: Snapshot) -> None: ...
-    def state(self) -> Snapshot: ...
+class DigitalTwin:                                          # implemented
+    def update(self, snapshot: Snapshot) -> None: ...          # validates, then notifies
+    def state(self) -> Snapshot | None: ...
     def history(self, window: int | None = None) -> pd.DataFrame: ...
+    def component_state(self, component: str) -> dict[str, float]: ...
+    def subscribe(self, callback) -> Callable[[], None]: ...   # returns unsubscribe
 
 class RULModel(Protocol):
     def fit(self, X: pd.DataFrame, y: pd.Series) -> None: ...

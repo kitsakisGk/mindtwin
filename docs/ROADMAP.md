@@ -39,12 +39,14 @@ Legend: ☐ todo · ☑ done
 ## Phase 1: Twin core (weeks 3–5)
 
 ### Week 3 · 7 Nov – 13 Nov: asset model
-- ☐ `Asset`, `Component`, `Sensor` data models
-- ☐ `DigitalTwin` class with state snapshot + history
-- ☐ Unit tests for state updates
+- ☑ `Asset`, `Component`, `Sensor` data models (built from the ontology)
+- ☑ `DigitalTwin` class with state snapshot + history + subscribers
+- ☑ Unit tests for state updates
+- ☑ Replay real C-MAPSS engines into twins (~21k snapshots/s); data tests run in CI
+- ☑ 📄 Implementation section: knowledge layer and twin core
 
 ### Week 4 · 14 Nov – 20 Nov: data ingestion
-- ☐ C-MAPSS dataset loader (FD001–FD004)
+- ☑ C-MAPSS dataset loader (FD001–FD004)
 - ☐ Stream simulator (replay engine data in real time)
 - ☐ Ingestion pipeline: stream → twin state
 - ☐ Feature engineering (rolling stats, normalisation per operating condition)
