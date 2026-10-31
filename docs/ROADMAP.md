@@ -30,7 +30,7 @@ Legend: ☐ todo · ☑ done
 ### Week 2 · 31 Oct – 6 Nov: design
 - ☑ Read and summarise core papers ([reading notes](research/reading-notes.md), 11 papers)
 - ☑ Turbofan ontology draft (components, sensors, failure modes), SOSA-aligned, with tests
-- ☐ Decide storage: time-series store + graph store
+- ☑ Decide storage: time-series store + graph store ([ADR 0001](decisions/0001-storage.md))
 - ☑ Config system (pydantic settings), logging
 - ☑ Pre-commit hooks, coverage in CI
 - ☑ 📄 Draft Related Work section from the reading notes
