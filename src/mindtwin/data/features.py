@@ -94,3 +94,29 @@ def rolling_features(
         feats = _window_features(g[sensors].to_numpy(float), g[cycle].to_numpy(), window)
         result[g["_row"].to_numpy()] = feats
     return pd.DataFrame(result, index=frame.index, columns=names)
+
+
+def latest_features(
+    twin,
+    sensors: Sequence[str] | None = None,
+    window: int = DEFAULT_WINDOW,
+    normalizer=None,
+) -> pd.Series:
+    """Features at a twin's current cycle, computed from its own history.
+
+    Gives the same values as :func:`rolling_features` on the full dataset at that cycle, so a
+    model trained offline can be applied live. ``normalizer`` (e.g. a fitted
+    :class:`~mindtwin.data.preprocessing.ConditionNormalizer`) is applied to the history first.
+    Returns an empty Series before the first update.
+    """
+    if sensors is None:
+        sensors = twin.asset.measurement_sensors()
+    history = twin.history(window)
+    if history.empty:
+        return pd.Series(dtype=float)
+    if normalizer is not None:
+        history = normalizer.transform(history)
+    feats = rolling_features(history, sensors, window=window, group=None)
+    row = feats.iloc[-1]
+    row.name = twin.cycle
+    return row

@@ -2,7 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from mindtwin.data.features import feature_names, rolling_features
+from mindtwin.core.assets import asset_from_ontology
+from mindtwin.core.twin import DigitalTwin, Snapshot
+from mindtwin.data.cmapss import default_data_dir
+from mindtwin.data.features import feature_names, latest_features, rolling_features
 
 
 def _frame():
@@ -103,3 +106,50 @@ def test_matches_reference_on_random_data_with_gaps(window):
     fast = rolling_features(df, ["a", "b", "c"], window=window).to_numpy()
     slow = _reference(values, df["cycle"].to_numpy(), window)
     np.testing.assert_allclose(fast, slow, rtol=1e-7, atol=1e-7)
+
+
+# ---------------------------------------------------------------- live features from a twin
+
+
+def test_latest_features_empty_twin():
+    assert latest_features(DigitalTwin(asset_from_ontology("e"))).empty
+
+
+def test_latest_features_match_offline():
+    twin = DigitalTwin(asset_from_ontology("e"))
+    rows = []
+    for c in range(1, 16):
+        readings = {"s11": 47 + 0.1 * c, "s7": 550 - 0.05 * c**1.5}
+        twin.update(Snapshot(asset_id="e", cycle=c, readings=readings))
+        rows.append({"unit": 1, "cycle": c, **readings})
+    offline = rolling_features(pd.DataFrame(rows), ["s11", "s7"], window=5).iloc[-1]
+    live = latest_features(twin, ["s11", "s7"], window=5)
+    assert live.name == 15
+    np.testing.assert_allclose(live.to_numpy(), offline.to_numpy(), rtol=1e-9)
+
+
+requires_data = pytest.mark.skipif(
+    not (default_data_dir() / "train_FD002.txt").exists(), reason="C-MAPSS not downloaded"
+)
+
+
+@requires_data
+@pytest.mark.integration
+def test_live_equals_offline_on_real_engine_with_normalisation():
+    """Multi-condition subset: normalise, then live twin features == offline features."""
+    from mindtwin.data.cmapss import load_cmapss
+    from mindtwin.data.preprocessing import ConditionNormalizer, informative_sensors
+    from mindtwin.data.replay import replay_engine
+
+    data = load_cmapss("FD002")
+    sensors = informative_sensors(data.train)
+    norm = ConditionNormalizer(sensors).fit(data.train)
+    offline = rolling_features(norm.transform(data.test), sensors, window=10)
+
+    unit = int(data.test["unit"].iloc[0])
+    rows = data.test[data.test["unit"] == unit].sort_values("cycle")
+    for cycle in [1, 5, 10, 37, int(rows["cycle"].max())]:
+        twin = replay_engine(data.test, unit, "FD002", "test", until_cycle=cycle)
+        live = latest_features(twin, sensors, window=10, normalizer=norm)
+        expected = offline.loc[rows.index[rows["cycle"] == cycle][0]]
+        np.testing.assert_allclose(live.to_numpy(), expected.to_numpy(), rtol=1e-7, atol=1e-9)
