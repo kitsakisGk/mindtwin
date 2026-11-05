@@ -49,7 +49,7 @@ Legend: ☐ todo · ☑ done
 - ☑ C-MAPSS dataset loader (FD001–FD004)
 - ☐ Stream simulator (replay engine data in real time)
 - ☐ Ingestion pipeline: stream → twin state
-- ☐ Feature engineering (rolling stats, normalisation per operating condition)
+- ☑ Feature engineering (rolling stats, normalisation per operating condition); live = offline
 
 ### Week 5 · 21 Nov – 27 Nov: knowledge graph
 - ☐ Ontology in code (RDF / OWL with rdflib)

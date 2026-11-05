@@ -43,3 +43,13 @@
   all 249 FD004 training engines (61,249 cycles) in 2.9 s, ~21k snapshots/s.
 - CI now downloads C-MAPSS (checksum verified, cached) and runs integration tests on real data.
 - Paper: Implementation section for the knowledge layer and twin core.
+
+## 2026-11-05 · Day 5
+- Trailing-window features per sensor: mean, std and slope over the last N cycles, never
+  looking ahead (tested: adding future cycles does not change past features).
+- First version looped over windows: 13 s on FD004. Rewritten with running sums: 0.6 s
+  (about 20x faster), checked against the slow version kept in the tests as a reference.
+- A 10-cycle mean of s11 tracks capped RUL better than the best single normalised reading
+  on FD004 (|rank corr| 0.74 vs 0.71).
+- `latest_features(twin)`: the twin computes the same features live from its own history;
+  tested equal to offline features on a real FD002 engine with per-condition normalisation.
