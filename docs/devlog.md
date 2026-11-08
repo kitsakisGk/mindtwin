@@ -53,3 +53,14 @@
   on FD004 (|rank corr| 0.74 vs 0.71).
 - `latest_features(twin)`: the twin computes the same features live from its own history;
   tested equal to offline features on a real FD002 engine with per-condition normalisation.
+
+## 2026-11-08 · Day 6
+- Fleet stream: engines interleaved on a shared clock, each joining at a random (seeded)
+  start tick, ordered by (tick, unit); optional pacing to N ticks per second (tested with a
+  fake clock, so tests stay fast).
+- `Fleet`: one twin per engine, created on first snapshot; fleet-level subscribers reach
+  existing and future twins. Fixed a bookkeeping bug before commit: subscribing the same
+  callback twice now gives two independent subscriptions.
+- Full FD004 training fleet (249 engines, staggered) streams in 4.8 s (~12.9k snapshots/s).
+- CLI demo: `python -m mindtwin.data.stream` prints fleet status as engines run.
+- Week 4 complete.

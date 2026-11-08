@@ -100,3 +100,18 @@ def test_paced_does_not_sleep_when_behind():
 def test_paced_rejects_bad_rate():
     with pytest.raises(ValueError):
         list(paced([], 0))
+
+
+def test_cli_prints_fleet_status(tmp_path, capsys):
+    from mindtwin.data.stream import main
+
+    frame = _frame({1: 4, 2: 3}).sort_values(["unit", "cycle"])
+    cols = ["unit", "cycle", *SETTING_COLS, *SENSOR_COLS]
+    for split in ("train", "test"):
+        frame[cols].to_csv(tmp_path / f"{split}_FD001.txt", sep=" ", header=False, index=False)
+    (tmp_path / "RUL_FD001.txt").write_text("10\n20\n")
+    main(["--data-dir", str(tmp_path), "--engines", "2", "--stagger", "0", "--every", "2"])
+    out = capsys.readouterr().out
+    assert "tick    0 | 2 engines" in out
+    assert "tick    2 |" in out and "#1:c3 103.00" in out
+    assert "done: 2 engines, 7 snapshots" in out

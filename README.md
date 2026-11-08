@@ -67,6 +67,23 @@ pytest
 pre-commit install          # optional, needs git >= 2.31
 ```
 
+## Try it
+
+Download the data once, then watch a simulated fleet of engines stream into their twins:
+
+```bash
+python -m mindtwin.data.cmapss download
+python -m mindtwin.data.stream --engines 4 --stagger 30 --every 40
+```
+
+```
+tick   40 | 4 engines | s11 | #4:c33 47.45  #3:c26 47.46  #2:c22 47.54  #1:c15 47.35
+tick   80 | 4 engines | s11 | #4:c73 47.57  #3:c66 47.43  #2:c49 47.67  #1:c31 47.23
+...
+```
+
+Add `--speed 5` to play it at 5 cycles per second.
+
 ## Project layout
 
 ```

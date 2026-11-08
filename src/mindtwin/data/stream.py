@@ -90,3 +90,56 @@ def paced(
         if wait > 0:
             sleep(wait)
         yield item
+
+
+def main(argv: Sequence[str] | None = None) -> None:
+    """Watch a simulated fleet: ``python -m mindtwin.data.stream --engines 5 --speed 10``."""
+    import argparse
+    from pathlib import Path
+
+    from mindtwin.core.fleet import Fleet
+    from mindtwin.data.cmapss import load_cmapss
+
+    parser = argparse.ArgumentParser(prog="python -m mindtwin.data.stream")
+    parser.add_argument("--subset", default="FD001")
+    parser.add_argument("--split", choices=["train", "test"], default="test")
+    parser.add_argument("--engines", type=int, default=5, help="first N engines")
+    parser.add_argument("--stagger", type=int, default=20, help="max start delay in ticks")
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--speed", type=float, default=0, help="ticks per second (0 = max)")
+    parser.add_argument("--every", type=int, default=25, help="print status every N ticks")
+    parser.add_argument("--sensor", default="s11", help="sensor shown in the status")
+    parser.add_argument("--data-dir", type=Path, default=None)
+    args = parser.parse_args(argv)
+
+    data = load_cmapss(args.subset, args.data_dir)
+    frame = data.train if args.split == "train" else data.test
+    units = sorted(int(u) for u in frame["unit"].unique())[: args.engines]
+    items: Iterable[StreamItem] = fleet_stream(
+        frame, args.subset, args.split, units, args.stagger, args.seed
+    )
+    if args.speed > 0:
+        items = paced(items, args.speed)
+
+    fleet = Fleet()
+
+    def show(tick: int) -> None:
+        cells = []
+        for twin in fleet:
+            value = twin.state().readings.get(args.sensor, float("nan"))
+            cells.append(f"#{twin.asset.id.rsplit('-', 1)[-1]}:c{twin.cycle} {value:.2f}")
+        print(f"tick {tick:>4} | {len(fleet)} engines | {args.sensor} | " + "  ".join(cells))
+
+    last_tick = None
+    for item in items:
+        if last_tick is not None and item.tick != last_tick and last_tick % args.every == 0:
+            show(last_tick)
+        fleet.ingest(item.snapshot)
+        last_tick = item.tick
+    if last_tick is not None:
+        show(last_tick)
+    print(f"done: {len(fleet)} engines, {int(fleet.status()['updates'].sum())} snapshots")
+
+
+if __name__ == "__main__":
+    main()

@@ -47,8 +47,8 @@ Legend: ☐ todo · ☑ done
 
 ### Week 4 · 14 Nov – 20 Nov: data ingestion
 - ☑ C-MAPSS dataset loader (FD001–FD004)
-- ☐ Stream simulator (replay engine data in real time)
-- ☐ Ingestion pipeline: stream → twin state
+- ☑ Stream simulator (fleet on a shared clock, staggered starts, real-time pacing, CLI demo)
+- ☑ Ingestion pipeline: stream → twin state (`Fleet` routes snapshots, creates twins)
 - ☑ Feature engineering (rolling stats, normalisation per operating condition); live = offline
 
 ### Week 5 · 21 Nov – 27 Nov: knowledge graph
