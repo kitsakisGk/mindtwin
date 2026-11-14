@@ -97,6 +97,87 @@ class KnowledgeGraph:
         result = self._g.query(sparql, initNs=prefixes)
         return [{str(k): str(v) for k, v in row.asdict().items()} for row in result]
 
+    # ------------------------------------------------------------------ structural queries
+
+    def _require(self, asset_id: str) -> URIRef:
+        if not self.has_asset(asset_id):
+            raise KeyError(f"Unknown asset {asset_id!r}")
+        return self.asset_uri(asset_id)
+
+    def _local(self, asset_id: str, uri: URIRef) -> str:
+        """Instance URI -> component/sensor id; the asset itself -> ASSET_LEVEL."""
+        if uri == self.asset_uri(asset_id):
+            return ASSET_LEVEL
+        return str(uri).rsplit("/", 1)[-1]
+
+    def _sensor(self, asset_id: str, sensor: str) -> URIRef:
+        a = self._require(asset_id)
+        s = self.part_uri(asset_id, sensor)
+        if (a, MT.hasSensor, s) not in self._g:
+            raise KeyError(f"Asset {asset_id!r} has no sensor {sensor!r}")
+        return s
+
+    def sensors_on(self, asset_id: str, component: str) -> list[str]:
+        """Sensor column names that monitor ``component`` of ``asset_id``."""
+        a = self._require(asset_id)
+        target = a if component == ASSET_LEVEL else self.part_uri(asset_id, component)
+        cols = [
+            str(self._g.value(s, MT.columnName))
+            for s in self._g.subjects(MT.monitors, target)
+            if (a, MT.hasSensor, s) in self._g
+        ]
+        return sorted(cols, key=lambda c: (len(c), c))
+
+    def component_of(self, asset_id: str, sensor: str) -> str:
+        """Component monitored by ``sensor`` (``ASSET_LEVEL`` for whole-engine sensors)."""
+        return self._local(asset_id, self._g.value(self._sensor(asset_id, sensor), MT.monitors))
+
+    def downstream_of(self, asset_id: str, component: str) -> set[str]:
+        """Components reachable from ``component`` along the flow path (transitive)."""
+        self._require(asset_id)
+        start = self.part_uri(asset_id, component)
+        return {
+            self._local(asset_id, c) for c in self._g.transitive_objects(start, MT.upstreamOf)
+        } - {component}
+
+    def affected_region(self, asset_id: str, component: str) -> set[str]:
+        """Where a fault in ``component`` can show up, by structure alone.
+
+        The component itself, everything downstream of it in the flow path, and the shafts
+        mechanically coupled to any of those. Coupling is followed one hop only (to the shaft,
+        not back through it), otherwise every component would reach every other one.
+        """
+        region = {component} | self.downstream_of(asset_id, component)
+        shafts = set()
+        for cid in region:
+            c = self.part_uri(asset_id, cid)
+            for other in self._g.objects(c, MT.mechanicallyCoupledTo):
+                shafts.add(self._local(asset_id, other))
+            for other in self._g.subjects(MT.mechanicallyCoupledTo, c):
+                shafts.add(self._local(asset_id, other))
+        return region | shafts
+
+    def fault_modes(self) -> dict[str, str]:
+        """All fault modes and the (template) component each one affects."""
+        return {
+            str(f).rsplit("#", 1)[-1]: str(self._g.value(f, MT.affects)).rsplit("#", 1)[-1]
+            for f in self._g.subjects(RDF.type, MT.FaultMode)
+        }
+
+    def candidate_faults(self, asset_id: str, sensor: str) -> list[str]:
+        """Fault modes that could, by structure, explain unusual readings on ``sensor``.
+
+        This is a structural prior only. Fault signatures learned from data (``mt:hasSymptom``)
+        will refine it, since real faults can also show up outside their structural region.
+        """
+        target = self.component_of(asset_id, sensor)
+        faults = self.fault_modes()
+        if target == ASSET_LEVEL:  # whole-engine sensor: any fault can show up
+            return sorted(faults)
+        return sorted(
+            f for f, comp in faults.items() if target in self.affected_region(asset_id, comp)
+        )
+
     # ------------------------------------------------------------------ persistence
 
     def save(self, path: str | Path) -> None:

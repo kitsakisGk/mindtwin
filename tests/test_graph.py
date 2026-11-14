@@ -60,3 +60,53 @@ def test_save_and_load_roundtrip(kg, tmp_path):
     again = KnowledgeGraph.load(path)
     assert len(again) == len(kg)
     assert again.assets() == kg.assets()
+
+
+# ---------------------------------------------------------------- structural queries
+
+
+def test_sensors_on_and_component_of(kg):
+    assert kg.sensors_on("FD001-test-1", "HPC") == ["s3", "s7", "s11", "s17"]
+    assert kg.sensors_on("FD001-test-1", "engine") == ["s10"]
+    assert kg.component_of("FD001-test-1", "s21") == "LPT"
+    assert kg.component_of("FD001-test-1", "s10") == "engine"
+
+
+def test_unknown_asset_or_sensor(kg):
+    with pytest.raises(KeyError, match="Unknown asset"):
+        kg.sensors_on("nope", "HPC")
+    with pytest.raises(KeyError, match="no sensor"):
+        kg.component_of("FD001-test-1", "s99")
+
+
+def test_downstream_matches_asset_model(kg):
+    asset = asset_from_ontology("FD001-test-1")
+    for comp in asset.components:
+        assert kg.downstream_of("FD001-test-1", comp) == asset.downstream_of(comp)
+
+
+def test_affected_region_follows_flow_then_one_shaft_hop(kg):
+    region = kg.affected_region("FD001-test-1", "HPC")
+    assert region == {"HPC", "Combustor", "HPT", "LPT", "Nozzle", "HPShaft", "LPShaft"}
+    assert "Fan" not in region and "LPC" not in region  # upstream of HPC
+    assert kg.affected_region("FD001-test-1", "Nozzle") == {"Nozzle"}
+
+
+def test_fault_modes(kg):
+    assert kg.fault_modes() == {"HPCDegradation": "HPC", "FanDegradation": "Fan"}
+
+
+@pytest.mark.parametrize(
+    "sensor, expected",
+    [
+        ("s11", ["FanDegradation", "HPCDegradation"]),  # HPC: own fault + fan upstream
+        ("s21", ["FanDegradation", "HPCDegradation"]),  # LPT: downstream of both
+        ("s8", ["FanDegradation", "HPCDegradation"]),  # LP shaft: driven by LPT
+        ("s1", ["FanDegradation"]),  # fan inlet: upstream of the HPC
+        ("s2", ["FanDegradation"]),  # LPC outlet: upstream of the HPC
+        ("s15", ["FanDegradation"]),  # bypass duct: fed by the fan only
+        ("s10", ["FanDegradation", "HPCDegradation"]),  # whole-engine ratio
+    ],
+)
+def test_candidate_faults(kg, sensor, expected):
+    assert kg.candidate_faults("FD001-test-1", sensor) == expected
