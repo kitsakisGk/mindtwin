@@ -64,3 +64,17 @@
 - Full FD004 training fleet (249 engines, staggered) streams in 4.8 s (~12.9k snapshots/s).
 - CLI demo: `python -m mindtwin.data.stream` prints fleet status as engines run.
 - Week 4 complete.
+
+## 2026-11-14 · Day 7
+- Repaired the local repo after the move: `.git/index` was missing (git saw every file as
+  deleted), `fleet.py` and `test_fleet.py` were missing from disk, and 4 git objects were missing
+  (7 older commits unreadable). Rebuilt the index, restored the 2 files from the last commit and
+  re-fetched the full history from GitHub. Verified: 0 missing objects, 32/32 commits readable.
+- Fleet knowledge graph: ontology + per-engine individuals linked to templates (`mt:basedOn`),
+  new `mt:hasSensor`; idempotent, save/load as Turtle. 160 triples per engine.
+- Queries: sensors on a component, component of a sensor, downstream components, affected
+  region of a fault, structural fault candidates per sensor.
+- Structural rule vs FD001 data (HPC fault): recall 83%, precision 83%. Misses s2 and s15
+  (upstream but react), over-predicts s9 and s14. Good prior, but signatures must be learned:
+  this is a concrete result for RQ3.
+- `Fleet(knowledge=kg)` registers each new engine in the graph automatically.

@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Iterator
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
 from mindtwin.core.assets import asset_from_ontology
 from mindtwin.core.models import Asset
 from mindtwin.core.twin import DigitalTwin, Snapshot, Subscriber
+
+if TYPE_CHECKING:
+    from mindtwin.knowledge.graph import KnowledgeGraph
 
 
 class _Subscription:
@@ -24,7 +28,8 @@ class _Subscription:
 class Fleet:
     """Twins of many assets of the same type.
 
-    A twin is created automatically the first time a snapshot for a new asset arrives.
+    A twin is created automatically the first time a snapshot for a new asset arrives, and
+    registered in ``knowledge`` (the fleet knowledge graph) when one is given.
     Fleet-level subscribers are attached to every twin, including twins created later.
     """
 
@@ -32,9 +37,11 @@ class Fleet:
         self,
         asset_factory: Callable[[str], Asset] = asset_from_ontology,
         max_history: int | None = None,
+        knowledge: KnowledgeGraph | None = None,
     ):
         self._asset_factory = asset_factory
         self._max_history = max_history
+        self.knowledge = knowledge
         self._twins: dict[str, DigitalTwin] = {}
         self._subscriptions: list[_Subscription] = []
 
@@ -58,6 +65,8 @@ class Fleet:
 
     def _create(self, asset_id: str) -> DigitalTwin:
         twin = DigitalTwin(self._asset_factory(asset_id), max_history=self._max_history)
+        if self.knowledge is not None:
+            self.knowledge.add_asset(twin.asset)
         for sub in self._subscriptions:
             sub.undo.append(twin.subscribe(sub.callback))
         self._twins[asset_id] = twin

@@ -32,10 +32,12 @@ Load both with `mindtwin.knowledge.ontology.load_ontology()`.
 | `hasComponent` / `partOf` | Asset ↔ Component |
 | `upstreamOf` (transitive) | Component → Component (flow order) |
 | `mechanicallyCoupledTo` (symmetric) | Component ↔ Component (shafts) |
+| `hasSensor` | Asset → Sensor |
 | `monitors` | Sensor → Component |
 | `affects` | FaultMode → Component |
 | `hasSymptom` | FaultMode → Sensor (learned) |
 | `observedOn`, `concerns`, `suspectedCause`, `atCycle` | Event → … |
+| `basedOn` | Individual → template it was created from |
 
 ## Turbofan structure
 
@@ -75,6 +77,26 @@ Thick arrows: fault modes (`affects`).
 HPT (s20) and LPT (s21). These are mostly **downstream of the fan** in the gas path, plus the bypass
 duct it feeds directly. A fault's signature follows the structure, which is what the reasoning
 layer will exploit.
+
+## Fleet knowledge graph
+
+`mindtwin.knowledge.graph.KnowledgeGraph` holds the ontology plus one set of individuals per
+engine (one graph for the whole fleet, see [ADR 0001](decisions/0001-storage.md)). Engine 42's HPC
+is `inst:FD001-test-42/HPC`, linked to the template with `mt:basedOn tf:HPC`, so template
+knowledge (e.g. which fault affects the HPC) applies to every engine. A `Fleet` created with
+`knowledge=kg` registers each new engine automatically (160 triples per engine).
+
+### Structural fault candidates
+
+`candidate_faults(asset, sensor)` returns the fault modes that could explain a sensor by
+structure alone. A fault in component *C* can show up in *C*, everything downstream of *C* in the
+gas path, and the shafts coupled to those (one hop, not back through the shaft).
+
+Checked against FD001 (HPC fault only, sensors with |rank corr with RUL| ≥ 0.5): the rule finds
+10 of the 12 reacting sensors (recall 83%, precision 83%). It misses s2 (LPC) and s15 (bypass
+ratio), which sit upstream but still react because a degraded HPC shifts the whole engine's
+operating point; it over-predicts the core-shaft speeds s9 and s14. Structure is a good prior,
+but signatures must be learned from data, which is what `mt:hasSymptom` is for.
 
 ## Open questions
 

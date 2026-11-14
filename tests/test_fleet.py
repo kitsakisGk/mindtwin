@@ -105,3 +105,34 @@ def test_same_callback_subscribed_twice_is_two_subscriptions():
     fleet.ingest(snap("a", 4))
     fleet.ingest(snap("c", 1))
     assert len(calls) == 5
+
+
+def test_new_twins_are_registered_in_knowledge_graph():
+    from mindtwin.knowledge.graph import KnowledgeGraph
+
+    kg = KnowledgeGraph()
+    fleet = Fleet(knowledge=kg)
+    fleet.ingest(snap("e1", 1))
+    fleet.ingest(snap("e2", 1))
+    fleet.ingest(snap("e1", 2))
+    assert kg.assets() == ["e1", "e2"]
+    assert kg.sensors_on("e2", "HPC") == ["s3", "s7", "s11", "s17"]
+    assert Fleet().knowledge is None
+
+
+@pytest.mark.skipif(
+    not (default_data_dir() / "test_FD001.txt").exists(), reason="C-MAPSS not downloaded"
+)
+@pytest.mark.integration
+def test_streamed_fleet_builds_knowledge_graph():
+    from mindtwin.data.cmapss import load_cmapss
+    from mindtwin.knowledge.graph import KnowledgeGraph
+
+    data = load_cmapss("FD001")
+    kg = KnowledgeGraph()
+    base = len(kg)
+    fleet = Fleet(knowledge=kg)
+    fleet.run(fleet_stream(data.test, "FD001", "test", stagger=50, seed=0))
+    assert len(kg.assets()) == 100
+    per_engine = (len(kg) - base) / 100
+    assert per_engine == int(per_engine)  # every engine adds the same structure

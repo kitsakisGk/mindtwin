@@ -10,7 +10,7 @@ The twin needs to store four kinds of data:
 |---|---|---|---|
 | Current state | One snapshot per asset | Tiny | Read constantly |
 | Sensor history | Time series per asset | Largest subset FD004 train: 61k rows, ~13 MB in pandas | Append per cycle; read recent windows for models |
-| Knowledge graph | RDF triples | Ontology + 709 engines × ~40 triples: well under 1M triples | Graph queries (SPARQL), small writes |
+| Knowledge graph | RDF triples | Ontology (~350 triples) + 709 engines × 160 triples (measured 2026-11-14): ~114k triples | Graph queries (SPARQL), small writes |
 | Episodic memory | Events (anomalies, prognoses, decisions) | Thousands | Append; search by asset, time, type |
 
 Constraints from the research plan: **reproducible** (anyone can clone and run, no services to
