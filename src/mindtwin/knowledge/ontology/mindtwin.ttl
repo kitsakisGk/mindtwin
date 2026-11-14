@@ -36,6 +36,14 @@ mt:hasComponent a owl:ObjectProperty ;
 mt:partOf a owl:ObjectProperty ;
     rdfs:label "part of"@en .
 
+mt:hasSensor a owl:ObjectProperty ;
+    rdfs:domain mt:Asset ; rdfs:range mt:Sensor ;
+    rdfs:label "has sensor"@en .
+
+mt:basedOn a owl:ObjectProperty ;
+    rdfs:label "based on"@en ;
+    rdfs:comment "Links an individual asset, component or sensor to the template it was created from (e.g. engine 42's HPC to the reference HPC). Template-level knowledge, such as which fault affects which component, applies to the individual through this link."@en .
+
 mt:upstreamOf a owl:ObjectProperty, owl:TransitiveProperty ;
     rdfs:domain mt:Component ; rdfs:range mt:Component ;
     rdfs:label "upstream of"@en ;
