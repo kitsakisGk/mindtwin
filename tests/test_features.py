@@ -153,3 +153,11 @@ def test_live_equals_offline_on_real_engine_with_normalisation():
         live = latest_features(twin, sensors, window=10, normalizer=norm)
         expected = offline.loc[rows.index[rows["cycle"] == cycle][0]]
         np.testing.assert_allclose(live.to_numpy(), expected.to_numpy(), rtol=1e-7, atol=1e-9)
+
+
+def test_latest_features_for_never_reported_sensor_is_nan():
+    twin = DigitalTwin(asset_from_ontology("e"))
+    twin.update(Snapshot(asset_id="e", cycle=1, readings={"s11": 47.0}))
+    feats = latest_features(twin, ["s11", "s1"], window=5)
+    assert feats["s11_mean"] == 47.0
+    assert np.isnan(feats[["s1_mean", "s1_std", "s1_slope"]]).all()

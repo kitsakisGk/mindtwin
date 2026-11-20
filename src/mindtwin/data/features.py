@@ -114,6 +114,9 @@ def latest_features(
     history = twin.history(window)
     if history.empty:
         return pd.Series(dtype=float)
+    missing = [s for s in sensors if s not in history.columns]
+    if missing:  # sensors never reported: features are NaN rather than an error
+        history = history.assign(**dict.fromkeys(missing, np.nan))
     if normalizer is not None:
         history = normalizer.transform(history)
     feats = rolling_features(history, sensors, window=window, group=None)
