@@ -127,3 +127,15 @@ def test_repr(engine):
     twin = DigitalTwin(engine)
     twin.update(snap(1))
     assert repr(twin) == "DigitalTwin(asset='e1', cycle=1, history=1)"
+
+
+def test_windowed_history_matches_full_history(engine):
+    twin = DigitalTwin(engine)
+    twin.update_many(snap(c) for c in range(1, 21))
+    for window in (1, 5, 20, 50):
+        fresh = twin.history(window)  # built from the last snapshots only
+        twin.history()  # fills the cache
+        cached = twin.history(window)  # served from the cache
+        assert fresh.equals(cached)
+        twin.update(snap(twin.cycle + 1))  # invalidate the cache again
+    assert twin.history(0).empty and twin.history(-3).empty

@@ -128,12 +128,23 @@ class DigitalTwin:
         """Latest snapshot, or ``None`` before the first update."""
         return self._history[-1] if self._history else None
 
+    @staticmethod
+    def _to_frame(snapshots: Iterable[Snapshot]) -> pd.DataFrame:
+        rows = [{"cycle": s.cycle, **s.settings, **s.readings} for s in snapshots]
+        frame = pd.DataFrame(rows)
+        return frame.set_index("cycle") if rows else frame
+
     def history(self, window: int | None = None) -> pd.DataFrame:
         """History as a DataFrame indexed by cycle (last ``window`` cycles if given)."""
+        if window is not None and self._frame_cache is None:
+            # Build only the rows asked for: rebuilding the whole history on every update
+            # made live features cost O(engine age) per cycle.
+            if window <= 0:
+                return self._to_frame([])
+            n = len(self._history)
+            return self._to_frame(self._history[i] for i in range(max(0, n - window), n))
         if self._frame_cache is None:
-            rows = [{"cycle": s.cycle, **s.settings, **s.readings} for s in self._history]
-            frame = pd.DataFrame(rows)
-            self._frame_cache = frame.set_index("cycle") if rows else frame
+            self._frame_cache = self._to_frame(self._history)
         frame = self._frame_cache
         return frame.tail(window).copy() if window is not None else frame.copy()
 

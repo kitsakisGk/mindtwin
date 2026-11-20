@@ -46,3 +46,18 @@ def test_informative_sensors_drops_flat_ones():
     df = _frame([(0, 0, 100)] * 4, [1.0] * 4)
     df["s2"] = [1.0, 2.0, 3.0, 4.0]
     assert informative_sensors(df) == ["s2"]
+
+
+def test_normalizer_fast_and_mixed_paths_agree_and_missing_columns_fail():
+    rng = np.random.default_rng(1)
+    settings = [(0, 0, 100)] * 30 + [(42, 0.84, 100)] * 30
+    df = _frame(settings, rng.normal(5, 2, 60))
+    norm = ConditionNormalizer(["s1", "s2"]).fit(df)
+    floats = df.astype(float)  # fast path: every column is float
+    mixed = df.assign(unit=1)  # slow path: an integer column is present
+    fast_out = norm.transform(floats)
+    mixed_out = norm.transform(mixed)
+    np.testing.assert_allclose(fast_out[["s1", "s2"]], mixed_out[["s1", "s2"]])
+    assert mixed_out["unit"].dtype == np.int64  # column types are preserved
+    with pytest.raises(KeyError, match="missing"):
+        norm.transform(df.drop(columns=["s2"]))

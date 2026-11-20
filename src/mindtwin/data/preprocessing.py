@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+import numpy as np
 import pandas as pd
 
 from mindtwin.data.cmapss import SENSOR_COLS
@@ -16,11 +17,12 @@ def operating_condition(df: pd.DataFrame) -> pd.Series:
     (setting1 to 0 decimals, setting2 to 2, setting3 as is) identifies the condition exactly:
     one condition in FD001/FD003, six in FD002/FD004.
     """
-    s1 = df["setting1"].round(0).abs()  # abs() folds -0.0 into 0.0
-    s2 = df["setting2"].round(2).abs()
-    s3 = df["setting3"].round(0)
-    key = s1.astype(str) + "|" + s2.astype(str) + "|" + s3.astype(str)
-    return key.rename("condition")
+    s1 = np.abs(np.round(df["setting1"].to_numpy(float), 0))  # abs() folds -0.0 into 0.0
+    s2 = np.abs(np.round(df["setting2"].to_numpy(float), 2))
+    s3 = np.round(df["setting3"].to_numpy(float), 0)
+    triples = zip(s1.tolist(), s2.tolist(), s3.tolist(), strict=True)
+    keys = [f"{a!r}|{b!r}|{c!r}" for a, b, c in triples]
+    return pd.Series(keys, index=df.index, name="condition", dtype=object)
 
 
 def informative_sensors(train: pd.DataFrame, tol: float = 1e-3) -> list[str]:
@@ -47,14 +49,34 @@ class ConditionNormalizer:
         self.std_ = grouped.std(ddof=0)
         self.global_mean_ = df[self.columns].mean()
         self.global_std_ = df[self.columns].std(ddof=0)
+        # Plain arrays for transform(): pandas reindex/fillna cost ~10 ms even on 10 rows,
+        # which dominated live feature computation.
+        self._row = {key: i for i, key in enumerate(self.mean_.index)}
+        self._mean = self.mean_.to_numpy(float)
+        self._std = self.std_.to_numpy(float)
+        self._gmean = self.global_mean_.to_numpy(float)
+        self._gstd = self.global_std_.to_numpy(float)
         return self
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        cond = operating_condition(df)
-        mean = self.mean_.reindex(cond).fillna(self.global_mean_).set_axis(df.index)
-        std = self.std_.reindex(cond).fillna(self.global_std_).set_axis(df.index)
+        rows = np.array([self._row.get(k, -1) for k in operating_condition(df)], dtype=int)
+        seen = (rows >= 0)[:, None]
+        mean = np.where(seen, self._mean[rows], self._gmean)  # rows == -1 is masked out
+        std = np.where(seen, self._std[rows], self._gstd)
+        mean = np.where(np.isnan(mean), self._gmean, mean)  # same as the former fillna
+        std = np.where(np.isnan(std), self._gstd, std)
+        pos = df.columns.get_indexer(self.columns)
+        if (pos < 0).any():
+            missing = [c for c, p in zip(self.columns, pos, strict=True) if p < 0]
+            raise KeyError(f"Columns missing from data: {missing}")
+        if all(dt == np.float64 for dt in df.dtypes):
+            # Fast path (e.g. twin histories): rebuild one float array instead of assigning
+            # columns one by one, which costs ~1.7 ms per call in pandas.
+            values = df.to_numpy(float, copy=True)
+            values[:, pos] = (values[:, pos] - mean) / (std + self.eps)
+            return pd.DataFrame(values, index=df.index, columns=df.columns)
         out = df.copy()
-        out[self.columns] = (df[self.columns] - mean) / (std + self.eps)
+        out[self.columns] = (df[self.columns].to_numpy(float) - mean) / (std + self.eps)
         return out
 
     def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
