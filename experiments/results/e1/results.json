@@ -1,0 +1,399 @@
+{
+  "environment": {
+    "python": "3.12.7",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "processor": "AMD64 Family 23 Model 24 Stepping 1, AuthenticAMD",
+    "mindtwin": "0.0.1",
+    "pandas": "3.1.1",
+    "numpy": "2.5.5",
+    "rdflib": "7.6.0",
+    "git_commit": "86c7cfd",
+    "timestamp_utc": "2026-11-20T20:25:55+00:00"
+  },
+  "settings": {
+    "subsets": [
+      "FD001",
+      "FD002",
+      "FD003",
+      "FD004"
+    ],
+    "twin_seeds": 3,
+    "full_seeds": 1,
+    "stagger": 100,
+    "window": 10,
+    "quick": false,
+    "out": "D:\\Projects\\CDT\\experiments\\results\\e1"
+  },
+  "runs": [
+    {
+      "subset": "FD001",
+      "config": "twin",
+      "seed": 0,
+      "engines": 100,
+      "cycles": 13096,
+      "ticks": 328,
+      "wall_s": 0.4088902000003145,
+      "throughput_per_s": 32028.158170555143,
+      "latency_ms": {
+        "p50": 0.0066,
+        "p95": 0.0102,
+        "p99": 0.01950499999999993,
+        "max": 33.6816
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD001",
+      "config": "twin",
+      "seed": 1,
+      "engines": 100,
+      "cycles": 13096,
+      "ticks": 378,
+      "wall_s": 0.44296400000166614,
+      "throughput_per_s": 29564.47928037209,
+      "latency_ms": {
+        "p50": 0.0069,
+        "p95": 0.011525,
+        "p99": 0.0165,
+        "max": 12.1251
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD001",
+      "config": "twin",
+      "seed": 2,
+      "engines": 100,
+      "cycles": 13096,
+      "ticks": 401,
+      "wall_s": 0.5229886999950395,
+      "throughput_per_s": 25040.693996111608,
+      "latency_ms": {
+        "p50": 0.0067,
+        "p95": 0.0133,
+        "p99": 0.0249,
+        "max": 8.663
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD001",
+      "config": "full",
+      "seed": 0,
+      "engines": 100,
+      "cycles": 13096,
+      "ticks": 328,
+      "wall_s": 44.914382800001476,
+      "throughput_per_s": 291.57697787621765,
+      "latency_ms": {
+        "p50": 3.1499,
+        "p95": 4.394475,
+        "p99": 9.637559999999995,
+        "max": 59.9976
+      },
+      "kg_triples": 16000
+    },
+    {
+      "subset": "FD002",
+      "config": "twin",
+      "seed": 0,
+      "engines": 259,
+      "cycles": 33991,
+      "ticks": 455,
+      "wall_s": 0.8397135999985039,
+      "throughput_per_s": 40479.277696658195,
+      "latency_ms": {
+        "p50": 0.0058,
+        "p95": 0.0076,
+        "p99": 0.0109,
+        "max": 4.315
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD002",
+      "config": "twin",
+      "seed": 1,
+      "engines": 259,
+      "cycles": 33991,
+      "ticks": 409,
+      "wall_s": 0.9396991999965394,
+      "throughput_per_s": 36172.21340629552,
+      "latency_ms": {
+        "p50": 0.0069,
+        "p95": 0.0091,
+        "p99": 0.0124,
+        "max": 7.8249
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD002",
+      "config": "twin",
+      "seed": 2,
+      "engines": 259,
+      "cycles": 33991,
+      "ticks": 419,
+      "wall_s": 0.8683378999994602,
+      "throughput_per_s": 39144.89969863244,
+      "latency_ms": {
+        "p50": 0.006,
+        "p95": 0.0079,
+        "p99": 0.01,
+        "max": 5.0483
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD002",
+      "config": "full",
+      "seed": 0,
+      "engines": 259,
+      "cycles": 33991,
+      "ticks": 455,
+      "wall_s": 113.71256239999639,
+      "throughput_per_s": 298.920359216187,
+      "latency_ms": {
+        "p50": 3.1716,
+        "p95": 4.2302,
+        "p99": 7.463519999999971,
+        "max": 106.0683
+      },
+      "kg_triples": 41440
+    },
+    {
+      "subset": "FD003",
+      "config": "twin",
+      "seed": 0,
+      "engines": 100,
+      "cycles": 16596,
+      "ticks": 475,
+      "wall_s": 0.3400595000057365,
+      "throughput_per_s": 48803.224140834296,
+      "latency_ms": {
+        "p50": 0.0058,
+        "p95": 0.0065,
+        "p99": 0.0082,
+        "max": 3.7788
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD003",
+      "config": "twin",
+      "seed": 1,
+      "engines": 100,
+      "cycles": 16596,
+      "ticks": 529,
+      "wall_s": 0.34401880000223173,
+      "throughput_per_s": 48241.54958941877,
+      "latency_ms": {
+        "p50": 0.0058,
+        "p95": 0.0075,
+        "p99": 0.0086,
+        "max": 4.2244
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD003",
+      "config": "twin",
+      "seed": 2,
+      "engines": 100,
+      "cycles": 16596,
+      "ticks": 490,
+      "wall_s": 0.3477698999995482,
+      "throughput_per_s": 47721.20876482283,
+      "latency_ms": {
+        "p50": 0.0058,
+        "p95": 0.0075,
+        "p99": 0.0094,
+        "max": 4.5625
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD003",
+      "config": "full",
+      "seed": 0,
+      "engines": 100,
+      "cycles": 16596,
+      "ticks": 475,
+      "wall_s": 54.02386249999836,
+      "throughput_per_s": 307.19758329017117,
+      "latency_ms": {
+        "p50": 3.1102,
+        "p95": 3.9763,
+        "p99": 5.887474999999999,
+        "max": 65.8301
+      },
+      "kg_triples": 16000
+    },
+    {
+      "subset": "FD004",
+      "config": "twin",
+      "seed": 0,
+      "engines": 248,
+      "cycles": 41214,
+      "ticks": 525,
+      "wall_s": 0.9246159000031184,
+      "throughput_per_s": 44574.184804588585,
+      "latency_ms": {
+        "p50": 0.0057,
+        "p95": 0.0075,
+        "p99": 0.0091,
+        "max": 78.4031
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD004",
+      "config": "twin",
+      "seed": 1,
+      "engines": 248,
+      "cycles": 41214,
+      "ticks": 568,
+      "wall_s": 0.8523291999954381,
+      "throughput_per_s": 48354.55596290798,
+      "latency_ms": {
+        "p50": 0.0057,
+        "p95": 0.0073,
+        "p99": 0.0087,
+        "max": 5.5515
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD004",
+      "config": "twin",
+      "seed": 2,
+      "engines": 248,
+      "cycles": 41214,
+      "ticks": 561,
+      "wall_s": 0.929057900000771,
+      "throughput_per_s": 44361.06727036689,
+      "latency_ms": {
+        "p50": 0.0058,
+        "p95": 0.0076,
+        "p99": 0.0098,
+        "max": 74.6304
+      },
+      "kg_triples": null
+    },
+    {
+      "subset": "FD004",
+      "config": "full",
+      "seed": 0,
+      "engines": 248,
+      "cycles": 41214,
+      "ticks": 525,
+      "wall_s": 136.53035709999676,
+      "throughput_per_s": 301.8669318341729,
+      "latency_ms": {
+        "p50": 3.1732,
+        "p95": 4.112839999999999,
+        "p99": 5.760470000000002,
+        "max": 125.9134
+      },
+      "kg_triples": 39680
+    }
+  ],
+  "summary": [
+    {
+      "subset": "FD001",
+      "config": "full",
+      "runs": 1,
+      "engines": 100,
+      "cycles": 13096,
+      "throughput_mean": 291.57697787621765,
+      "throughput_std": 0.0,
+      "p50_ms": 3.1499,
+      "p99_ms": 9.637559999999995,
+      "kg_triples": 16000
+    },
+    {
+      "subset": "FD001",
+      "config": "twin",
+      "runs": 3,
+      "engines": 100,
+      "cycles": 13096,
+      "throughput_mean": 28877.77714901294,
+      "throughput_std": 3543.985575618623,
+      "p50_ms": 0.006733333333333333,
+      "p99_ms": 0.02030166666666664,
+      "kg_triples": null
+    },
+    {
+      "subset": "FD002",
+      "config": "full",
+      "runs": 1,
+      "engines": 259,
+      "cycles": 33991,
+      "throughput_mean": 298.920359216187,
+      "throughput_std": 0.0,
+      "p50_ms": 3.1716,
+      "p99_ms": 7.463519999999971,
+      "kg_triples": 41440
+    },
+    {
+      "subset": "FD002",
+      "config": "twin",
+      "runs": 3,
+      "engines": 259,
+      "cycles": 33991,
+      "throughput_mean": 38598.79693386205,
+      "throughput_std": 2204.8518935739708,
+      "p50_ms": 0.006233333333333334,
+      "p99_ms": 0.0111,
+      "kg_triples": null
+    },
+    {
+      "subset": "FD003",
+      "config": "full",
+      "runs": 1,
+      "engines": 100,
+      "cycles": 16596,
+      "throughput_mean": 307.19758329017117,
+      "throughput_std": 0.0,
+      "p50_ms": 3.1102,
+      "p99_ms": 5.887474999999999,
+      "kg_triples": 16000
+    },
+    {
+      "subset": "FD003",
+      "config": "twin",
+      "runs": 3,
+      "engines": 100,
+      "cycles": 16596,
+      "throughput_mean": 48255.32749835864,
+      "throughput_std": 541.139253392667,
+      "p50_ms": 0.0058,
+      "p99_ms": 0.008733333333333334,
+      "kg_triples": null
+    },
+    {
+      "subset": "FD004",
+      "config": "full",
+      "runs": 1,
+      "engines": 248,
+      "cycles": 41214,
+      "throughput_mean": 301.8669318341729,
+      "throughput_std": 0.0,
+      "p50_ms": 3.1732,
+      "p99_ms": 5.760470000000002,
+      "kg_triples": 39680
+    },
+    {
+      "subset": "FD004",
+      "config": "twin",
+      "runs": 3,
+      "engines": 248,
+      "cycles": 41214,
+      "throughput_mean": 45763.26934595449,
+      "throughput_std": 2246.648508167199,
+      "p50_ms": 0.005733333333333333,
+      "p99_ms": 0.0092,
+      "kg_triples": null
+    }
+  ]
+}

@@ -78,3 +78,19 @@
   (upstream but react), over-predicts s9 and s14. Good prior, but signatures must be learned:
   this is a concrete result for RQ3.
 - `Fleet(knowledge=kg)` registers each new engine in the graph automatically.
+
+## 2026-11-20 · Day 8
+- D: drive keeps corrupting (NTFS errors since 13 Nov; chkdsk on 15 Nov did not stop it).
+  Today 22 project files were missing and 2 damaged, `.git` had 117 missing objects and the
+  `.venv` had unreadable folders. Restored everything from GitHub (`git fetch --refetch`,
+  rebuilt index, restored files), verified all 82 files and all 13 data files byte-for-byte,
+  and built a fresh environment in `venv/`. From now on: push after every commit.
+- `LiveView`: joins graph structure with live twin values at query time (component readings,
+  readings in a fault's affected region, full sensor context with trend and candidate faults).
+  Found and fixed a bug: live features crashed for a sensor that never reported.
+- Performance: per-condition normalisation took ~10 ms per call even on 10 rows (pandas
+  overhead). Rewritten with arrays, outputs identical on all subsets: 0.53 ms (19x faster).
+  Twin history windows are now built from the last N snapshots only. Full stack 4.3x faster.
+- E1 (RQ1): all 4 test fleets (407 engines, 104,897 cycles). Twin core 29k-48k cycles/s
+  (p50 6 us); full stack (twin + KG + live normalised features) ~300 cycles/s (p50 3.2 ms,
+  p99 < 10 ms), flat across subsets. Features are >99% of full-stack time. Paper Results: E1.

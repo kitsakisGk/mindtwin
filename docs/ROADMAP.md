@@ -54,10 +54,10 @@ Legend: ☐ todo · ☑ done
 ### Week 5 · 21 Nov – 27 Nov: knowledge graph
 - ☑ Ontology in code (RDF / OWL with rdflib)
 - ☑ Build knowledge graph per engine instance (one fleet graph, `Fleet` registers engines)
-- ☐ Link live sensor state to graph nodes
+- ☑ Link live sensor state to graph nodes (`LiveView`: graph structure + twin values at query time)
 - ☑ Graph queries (SPARQL helpers, structural fault candidates)
 - ☐ 📄 Draft Architecture and Implementation sections + architecture figure
-- ☐ 📄 Experiment E1 (end-to-end run, latency/throughput)
+- ☑ 📄 Experiment E1 (end-to-end run, latency/throughput)
 
 ## Phase 2: Cognition (weeks 6–9)
 
